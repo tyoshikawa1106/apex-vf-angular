@@ -1,0 +1,168 @@
+<apex:page >
+    <script type="text/javascript">
+        (function($j){
+            // フォーカスクリア
+            beenFocused = true;
+
+            // AngularJS
+            var myApp = angular.module('myApp', ['ngAnimate']);
+            myApp.controller('mainCtrl', ['$scope', '$sce', function($scope, $sce) {
+                // 削除対象の取引先責任者リスト初期化
+                $scope.delContactIds = [];
+                // 取引先IDを取得
+                var accountId = helper.getAccountId();
+                // 取引先責任者の取得
+                getContactsByApex(accountId);
+                // 選択リスト初期値取得
+                getSelectListItemByApex();
+
+                // 保存ボタン処理
+                $scope.doSave = function(event) {
+                    event.preventDefault();
+
+                    // 取引先情報をセット
+                    $scope.account = helper.getAccountObject(accountId);
+
+                    var accountObj = JSON.stringify($scope.account);
+                    var contactObj = JSON.stringify($scope.contacts);
+                    var delContactIdsObj = JSON.stringify($scope.delContactIds);
+
+                    // 保存処理を実行
+                    doSaveByApex(accountObj, contactObj, delContactIdsObj);
+                };
+
+                // 行追加処理
+                $scope.addContactRow = function(event) {
+                    event.preventDefault();
+                    $scope.contacts.splice(0, 0, helper.getContactObject());
+                }
+
+                // 行コピー処理
+                $scope.doCopyContactRow = function(event, rowNo) {
+                    event.preventDefault();
+                    var targetContact = helper.setCopyContact(helper.getContactObject(), $scope.contacts[rowNo]);
+                    $scope.contacts.splice(rowNo + 1, 0, targetContact);
+                }
+
+                // 取引先責任者の値変更
+                $scope.changeContact = function(rowNo) {
+                    $scope.contacts[rowNo].IsChanged = true;
+                }
+
+                // 行削除処理
+                $scope.removeContactRow = function(event, rowNo) {
+                    event.preventDefault();
+                    // IDが存在する場合、削除対象としてリストに追加
+                    if ($scope.contacts[rowNo].Id) {
+                        $scope.delContactIds.push($scope.contacts[rowNo].Id);
+                    }
+                    // テーブルから除外
+                    $scope.contacts.splice(rowNo, 1);
+                }
+                
+                // 取引先責任者の取得
+                function getContactsByApex(accountId) {
+                    // RemoteAction
+                    AngularAccountController.getContacts(accountId, function(results, event){
+                        if(event.status) {
+                            $scope.contacts = results;
+                            $scope.$apply();
+                        }
+                    }, {escape: false});
+                    return false;
+                }
+
+                /**
+                 * 選択リスト初期値取得
+                 */
+                function getSelectListItemByApex() {
+                    // RemoteAction
+                    AngularAccountController.getAngularAccountSelectListItem(function(result, event){
+                        if(event.status) {
+                            // LeadSource選択リスト値取得
+                            $scope.leadSourceItems = getSelectListItem(result.leadSourceMap);
+                            $scope.$apply();
+                        } else {
+                            alert('[ERROR]選択リスト初期値取得 = ' + event.message);
+                        }
+                    }, {escape: false});
+                    return false;
+                }
+
+                /**
+                 * 選択リスト値取得
+                 */
+                function getSelectListItem(resultMap) {
+                    var resultObj = new Object();
+                    var i = 0;
+                    for (var key in resultMap) {
+                        resultObj[i] = {value: key, label: resultMap[key]};
+                        i++;
+                    }
+                    return resultObj;
+                }
+
+                // 保存ボタンの処理
+                function doSaveByApex(accountObj, contactObj, delContactIdsObj) {
+                    $scope.errorMessages = [];
+                    // RemoteAction
+                    AngularAccountController.doSave(accountObj, contactObj, delContactIdsObj, function(result, event){
+                        if(event.status) {
+                            if (result.errorMessages.length > 0) {
+                                // エラーメッセージを表示
+                                $scope.errorMessages = result.errorMessages;
+                            } else {
+                                // 登録成功後に詳細ページに繊維
+                                location.href = '/' + result.accountId;
+                            }
+                        } else {
+                            alert(event.message);
+                        }
+                        $scope.$apply();
+                        return false;
+                    });
+                }
+            }]).filter('unsafe', function($sce) { return $sce.trustAsHtml; });
+
+            // Helper
+            helper = {
+                // 取引先IDを取得
+                getAccountId: function() {
+                    var accountId = document.getElementById('{!$Component.form.accountId}').value;
+                    return accountId;
+                },
+                // 取引先オブジェクトを取得
+                getAccountObject: function(accountId) {
+                    var accountName = document.getElementById('{!$Component.form.block.section.accName}').value;
+                    var accountNumber = document.getElementById('{!$Component.form.block.section.accNumber}').value;
+                    return {
+                        Id: accountId,
+                        Name: accountName,
+                        AccountNumber: accountNumber
+                    };
+                },
+                // 取引先責任者オブジェクト取得
+                getContactObject: function() {
+                    return {
+                        Id: "",
+                        LastName: "",
+                        FirstName: "",
+                        LeadSource: "",
+                        Description: "",
+                        IsChanged: false
+                    };
+                },
+                // 取引先責任者のコピー
+                setCopyContact: function(newContact, baseContact) {
+                    newContact.Id = "";
+                    newContact.LastName = baseContact.LastName;
+                    newContact.FirstName = baseContact.FirstName;
+                    newContact.LeadSource = baseContact.LeadSource;
+                    newContact.Description = baseContact.Description;
+                    newContact.IsChanged = false;
+                    return newContact;
+                }
+            };
+        })(jQuery);
+    </script>
+</apex:page>

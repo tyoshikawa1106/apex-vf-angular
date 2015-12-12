@@ -1,0 +1,102 @@
+<apex:page standardController="Account" extensions="AngularAccountController" showHeader="true" sidebar="false" id="page">
+    <head>
+        <apex:includeScript value="https://code.jquery.com/jquery-2.1.4.min.js" />
+        <apex:includeScript value="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.8/angular.min.js" />
+        <apex:includeScript value="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.8/angular-animate.min.js" />
+        <apex:includeScript value="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js" />
+        <apex:include pageName="AngularAccountCss" />
+    </head>
+    <body>
+        <div id="vf-page">
+            <apex:sectionHeader title="{!$ObjectType.Account.Label}" subTitle="{!IF(account.Id != null, account.Name, '')}" />
+            <apex:form id="form">
+                <div ng-app="myApp">
+                    <div ng-controller="mainCtrl">
+                        <apex:inputHidden value="{!account.Id}" id="accountId" />
+                        <apex:pageBlock mode="edit" id="block">
+                            <!-- pageMessages -->
+                            <apex:pageMessages id="msg" />
+                            <!-- Message Box -->
+                            <c:AngularAccountMessage />
+                            <apex:pageBlockButtons location="bottom" id="buttons">
+                                <apex:commandButton value=" Save " html-ng-click="doSave($event)" />
+                                <apex:commandButton value=" Cancel " action="{!Cancel}" reRender="form" />
+                            </apex:pageBlockButtons>
+                            <apex:pageBlockSection title="Info" id="section">
+                                <apex:inputField value="{!account.Name}" id="accName" />
+                                <apex:inputField value="{!account.AccountNumber}" id="accNumber" />
+                            </apex:pageBlockSection>
+                        </apex:pageBlock>
+                        <apex:pageBlock mode="edit" id="contactBlock">
+                            <apex:pageBlockSection columns="1" id="contactSection">
+                                <apex:outputPanel >
+                                    <table cellpadding="0" cellspacing="0" class="contactTable">
+                                        <colgroup>
+                                            <col width="100" />
+                                            <col width="50" />
+                                            <col />
+                                            <col />
+                                            <col />
+                                            <col />
+                                        </colgroup>
+                                        <thead>
+                                            <th style="text-align: center;">
+                                                <apex:outputLink html-ng-click="addContactRow($event)" style="text-decoration: none;color: 000; font-weight: 900;">
+                                                    <apex:outputText value="＋" />
+                                                </apex:outputLink>
+                                            </th>
+                                            <th>
+                                                <apex:outputText value="No" />
+                                            </th>
+                                            <th>
+                                                <apex:outputText value="{!$ObjectType.Contact.Fields.LastName.Label}" />
+                                            </th>
+                                            <th>
+                                                <apex:outputText value="{!$ObjectType.Contact.Fields.FirstName.Label}" />
+                                            </th>
+                                            <th>
+                                                <apex:outputText value="{!$ObjectType.Contact.Fields.LeadSource.Label}" />
+                                            </th>
+                                            <th>
+                                                <apex:outputText value="{!$ObjectType.Contact.Fields.Description.Label}" />
+                                            </th>
+                                        </thead>
+                                        <tbody id="contactTableBody">
+                                            <tr ng-repeat="item in contacts" class="my-repeat-animation" ng-class="{activeRow: item.Id == '' || item.IsChanged}">
+                                                <td style="text-align: center; font-size: 8px;">
+                                                    <apex:outputLink html-ng-click="doCopyContactRow($event, $index)">
+                                                        <apex:outputText value="Copy" />
+                                                    </apex:outputLink>
+                                                    <apex:outputText value=" | " />
+                                                    <apex:outputLink html-ng-click="removeContactRow($event, $index)">
+                                                        <apex:outputText value="Delete" />
+                                                    </apex:outputLink>
+                                                </td>
+                                                <td>
+                                                    <apex:outputText html-ng-bind="$index + 1" />
+                                                </td>
+                                                <td>
+                                                    <input type="text" ng-model="item.LastName" ng-change="changeContact($index)" />
+                                                </td>
+                                                <td>
+                                                    <input type="text" ng-model="item.FirstName" ng-change="changeContact($index)" />
+                                                </td>
+                                                <td>
+                                                    <select ng-model="item.LeadSource" ng-options="leadSource.value as leadSource.label for leadSource in leadSourceItems" ng-change="changeContact($index)"></select>
+                                                </td>
+                                                <td>
+                                                    <textarea row="3" maxlength="500" ng-model="item.Description" ng-change="changeContact($index)" />
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </apex:outputPanel>
+                            </apex:pageBlockSection>
+                        </apex:pageBlock>
+                    </div>
+                </div>
+            </apex:form>
+        </div>
+        <apex:include pageName="AngularAccountScript" />
+    </body>
+</apex:page>
