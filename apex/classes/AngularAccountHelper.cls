@@ -8,18 +8,6 @@ public with sharing class AngularAccountHelper {
     }
 
     /**
-     * 取引先のJSON文字列存在判定
-     */
-    public AngularAccountResult isEmptyAccountJSON(String accountJSON, AngularAccountResult result) {
-        if (String.isEmpty(accountJSON)) {
-            result.errorMessages.add('取引先のJSON文字列取得に失敗しました。');
-            return result;
-        }
-
-        return result;
-    }
-
-    /**
      * 削除対象取引先責任者ID取得
      */
     public Set<Id> getDelContactIdsByJson(List<Object> jsonDelContactIdList) {
@@ -29,24 +17,6 @@ public with sharing class AngularAccountHelper {
         }
         
         return delContactIds;
-    }
-
-    /**
-     * 取引先取得
-     */
-    public Account getAccountByJson(Map<String, Object> jsonMap) {
-        Account account = new Account();
-        if (jsonMap.containsKey('Id') && String.isNotEmpty((String)jsonMap.get('Id'))) {
-            account.Id = (String)jsonMap.get('Id');
-        }
-        if (jsonMap.containsKey('Name') && String.isNotEmpty((String)jsonMap.get('Name'))) {
-            account.Name = (String)jsonMap.get('Name');
-        }
-        if (jsonMap.containsKey('AccountNumber') && String.isNotEmpty((String)jsonMap.get('AccountNumber'))) {
-            account.AccountNumber = (String)jsonMap.get('AccountNumber');
-        }
-
-        return account;
     }
 
     /**

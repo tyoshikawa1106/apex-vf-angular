@@ -42,17 +42,19 @@ public with sharing class AngularAccountController {
      * 保存処理実行
      */
     @RemoteAction
-    public static AngularAccountResult doSave(String accountJSON, String contactJSON, String deleteContactIdsJSON) {
+    public static AngularAccountResult doSave(Account account, String contactJSON, String deleteContactIdsJSON) {
         Savepoint sp = Database.setSavepoint();
         AngularAccountResult result = new AngularAccountResult();
 
         try {
+            /*
             // 取引先のJSON文字列存在判定
             result = helper.isEmptyAccountJSON(accountJSON, result);
             // エラーがある場合は処理終了
             if (!result.errorMessages.isEmpty()) {
                 return result;
             }
+            */
 
             // 取引先責任者の削除
             if (String.isNotEmpty(deleteContactIdsJSON)) {
@@ -65,12 +67,13 @@ public with sharing class AngularAccountController {
                 // 取引先責任者の削除
                 delete deleteContacts;
             }
-
+            /*
             // JSON → Map
             Map<String, Object> jsonAccountMap = (Map<String, Object>) JSON.deserializeUntyped(accountJSON);
             System.debug(jsonAccountMap);
             // 取引先取得
             Account account = helper.getAccountByJson(jsonAccountMap);
+            */
             // 取引先値チェック
             result = helper.isAccountValidation(account, result);
             // エラーがある場合は処理終了
@@ -100,6 +103,7 @@ public with sharing class AngularAccountController {
             
             // 取引先IDを返す
             result.accountId = account.Id;
+
         } catch(DmlException e) {
             Database.rollback(sp);
             result.errorMessages.add(e.getDmlMessage(0));

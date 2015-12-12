@@ -111,13 +111,13 @@ private class AngularAccountControllerTest {
 
         System.runAs(testAdminUser) {
 
-            String accountJSON = '';
+            Account account = new Account();
             String contactJSON = '';
             String deleteContactIdsJSON = '';
 
             Test.startTest();
 
-            AngularAccountResult result = AngularAccountController.doSave(accountJSON, contactJSON, deleteContactIdsJSON);
+            AngularAccountResult result = AngularAccountController.doSave(account, contactJSON, deleteContactIdsJSON);
 
             Test.stopTest();
 
@@ -133,20 +133,15 @@ private class AngularAccountControllerTest {
 
         System.runAs(testAdminUser) {
 
-            // JSON文字列の生成
-            JSONGenerator gen = JSON.createGenerator(true);
-            gen.writeStartObject();
-            gen.writeStringField('Id', '');
-            gen.writeStringField('Name', 'MySalesforce');
-            gen.writeStringField('AccountNumber', 'SF-1');
-            gen.writeEndObject();
-            String accountJSON = gen.getAsString();
+            // 取引先テストデータ
+            Account account = AngularAccountTester.createAccount(false);
+
             String contactJSON = '';
             String deleteContactIdsJSON = '';
 
             Test.startTest();
 
-            AngularAccountResult result = AngularAccountController.doSave(accountJSON, contactJSON, deleteContactIdsJSON);
+            AngularAccountResult result = AngularAccountController.doSave(account, contactJSON, deleteContactIdsJSON);
 
             Test.stopTest();
 
@@ -163,20 +158,16 @@ private class AngularAccountControllerTest {
 
         System.runAs(testAdminUser) {
 
-            // JSON文字列の生成
-            JSONGenerator gen = JSON.createGenerator(true);
-            gen.writeStartObject();
-            gen.writeStringField('Id', '');
-            gen.writeStringField('Name', '');
-            gen.writeStringField('AccountNumber', 'SF-1');
-            gen.writeEndObject();
-            String accountJSON = gen.getAsString();
+            // 取引先テストデータ
+            Account account = AngularAccountTester.createAccount(false);
+            account.Name = '';
+
             String contactJSON = '';
             String deleteContactIdsJSON = '';
 
             Test.startTest();
 
-            AngularAccountResult result = AngularAccountController.doSave(accountJSON, contactJSON, deleteContactIdsJSON);
+            AngularAccountResult result = AngularAccountController.doSave(account, contactJSON, deleteContactIdsJSON);
 
             Test.stopTest();
 
@@ -193,14 +184,8 @@ private class AngularAccountControllerTest {
 
         System.runAs(testAdminUser) {
 
-            // JSON文字列の生成
-            JSONGenerator gen = JSON.createGenerator(true);
-            gen.writeStartObject();
-            gen.writeStringField('Id', '');
-            gen.writeStringField('Name', 'MySalesforce');
-            gen.writeStringField('AccountNumber', 'SF-1');
-            gen.writeEndObject();
-            String accountJSON = gen.getAsString();
+            // 取引先テストデータ
+            Account account = AngularAccountTester.createAccount(false);
 
             // JSON文字列の生成
             JSONGenerator conGen = JSON.createGenerator(true);
@@ -215,7 +200,7 @@ private class AngularAccountControllerTest {
 
             Test.startTest();
 
-            AngularAccountResult result = AngularAccountController.doSave(accountJSON, contactJSON, deleteContactIdsJSON);
+            AngularAccountResult result = AngularAccountController.doSave(account, contactJSON, deleteContactIdsJSON);
 
             Test.stopTest();
 
@@ -235,14 +220,8 @@ private class AngularAccountControllerTest {
 
         System.runAs(testAdminUser) {
 
-            // JSON文字列の生成
-            JSONGenerator gen = JSON.createGenerator(true);
-            gen.writeStartObject();
-            gen.writeStringField('Id', '');
-            gen.writeStringField('Name', 'MySalesforce');
-            gen.writeStringField('AccountNumber', 'SF-1');
-            gen.writeEndObject();
-            String accountJSON = gen.getAsString();
+            // 取引先テストデータ
+            Account account = AngularAccountTester.createAccount(false);
 
             // JSON文字列の生成
             JSONGenerator conGen = JSON.createGenerator(true);
@@ -257,7 +236,7 @@ private class AngularAccountControllerTest {
 
             Test.startTest();
 
-            AngularAccountResult result = AngularAccountController.doSave(accountJSON, contactJSON, deleteContactIdsJSON);
+            AngularAccountResult result = AngularAccountController.doSave(account, contactJSON, deleteContactIdsJSON);
 
             Test.stopTest();
 
@@ -277,23 +256,17 @@ private class AngularAccountControllerTest {
 
         System.runAs(testAdminUser) {
 
+            // 取引先テストデータ
             Account account = AngularAccountTester.createAccount(true);
-            Contact contact = AngularAccountTester.createContact(account, true);
-
-            // JSON文字列の生成
-            JSONGenerator gen = JSON.createGenerator(true);
-            gen.writeStartObject();
-            gen.writeStringField('Id', account.Id);
-            gen.writeStringField('Name', 'MySalesforce');
-            gen.writeStringField('AccountNumber', 'SF-1');
-            gen.writeEndObject();
-            String accountJSON = gen.getAsString();
+            // 取引先責任者JSON文字列
             String contactJSON  = '';
+            // 取引先責任者情報作成
+            Contact contact = AngularAccountTester.createContact(account, true);
             String deleteContactIdsJSON = '[' + '\"' + contact.Id + '\"' + ']';
 
             Test.startTest();
 
-            AngularAccountResult result = AngularAccountController.doSave(accountJSON, contactJSON, deleteContactIdsJSON);
+            AngularAccountResult result = AngularAccountController.doSave(account, contactJSON, deleteContactIdsJSON);
 
             Test.stopTest();
 

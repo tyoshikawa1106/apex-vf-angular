@@ -23,7 +23,7 @@
                     // 取引先情報をセット
                     $scope.account = helper.getAccountObject(accountId);
 
-                    var accountObj = JSON.stringify($scope.account);
+                    var accountObj = $scope.account;
                     var contactObj = JSON.stringify($scope.contacts);
                     var delContactIdsObj = JSON.stringify($scope.delContactIds);
 
