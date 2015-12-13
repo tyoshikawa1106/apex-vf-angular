@@ -42,20 +42,11 @@ public with sharing class AngularAccountController {
      * 保存処理実行
      */
     @RemoteAction
-    public static AngularAccountResult doSave(Account account, String contactJSON, String deleteContactIdsJSON) {
+    public static AngularAccountResult doSave(Account account, String deleteContactIdsJSON, Map<Integer, AngularAccountApexContact> apexContactMap) {
         Savepoint sp = Database.setSavepoint();
         AngularAccountResult result = new AngularAccountResult();
-
+        
         try {
-            /*
-            // 取引先のJSON文字列存在判定
-            result = helper.isEmptyAccountJSON(accountJSON, result);
-            // エラーがある場合は処理終了
-            if (!result.errorMessages.isEmpty()) {
-                return result;
-            }
-            */
-
             // 取引先責任者の削除
             if (String.isNotEmpty(deleteContactIdsJSON)) {
                 // JSON → Map
@@ -67,13 +58,6 @@ public with sharing class AngularAccountController {
                 // 取引先責任者の削除
                 delete deleteContacts;
             }
-            /*
-            // JSON → Map
-            Map<String, Object> jsonAccountMap = (Map<String, Object>) JSON.deserializeUntyped(accountJSON);
-            System.debug(jsonAccountMap);
-            // 取引先取得
-            Account account = helper.getAccountByJson(jsonAccountMap);
-            */
             // 取引先値チェック
             result = helper.isAccountValidation(account, result);
             // エラーがある場合は処理終了
@@ -85,11 +69,9 @@ public with sharing class AngularAccountController {
             upsert account;
 
             // 取引先責任者の登録
-            if (String.isNotEmpty(contactJSON)) {
-                // JSON → Map
-                List<Object> jsonContactList = (List<Object>) JSON.deserializeUntyped(contactJSON);
+            if (!apexContactMap.isEmpty()) {
                 // 取引先責任者取得
-                List<Contact> contacts = helper.getContactsByJson(account.Id, jsonContactList);
+                List<Contact> contacts = helper.getContactsByApexMap(apexContactMap, account.Id);
                 // 取引先責任者値チェック
                 result = helper.isContactValidation(contacts, result);
                 // エラーがある場合は処理終了
@@ -113,7 +95,7 @@ public with sharing class AngularAccountController {
             result.errorMessages.add(e.getMessage());
             return result;
         }
-
+        
         return result;
     }
 }

@@ -33,40 +33,24 @@ public with sharing class AngularAccountHelper {
     /**
      * 取引先責任者取得
      */
-    public List<Contact> getContactsByJson(Id accountId, List<Object> jsonContactList) {
-
+    public List<Contact> getContactsByApexMap(Map<Integer, AngularAccountApexContact> apexContactMap, Id accountId) {
         List<Contact> contacts = new List<Contact>();
-        for (Object item : jsonContactList) {
-            Map<String, Object> itemMap = (Map<String, Object>)item;
-            Boolean isChanged = false;
-
-            Contact contact = new Contact();
-            contact.AccountId = accountId;
-
-            if (itemMap.containsKey('IsChanged')) {
-                isChanged = (Boolean)itemMap.get('IsChanged');
-            }
-            if (itemMap.containsKey('Id') && String.isNotEmpty((String)itemMap.get('Id'))) {
-                contact.Id = (Id)itemMap.get('Id');
-            }
-            if (itemMap.containsKey('LastName') && String.isNotEmpty((String)itemMap.get('LastName'))) {
-                contact.LastName = (String)itemMap.get('LastName');
-            }
-            if (itemMap.containsKey('FirstName') && String.isNotEmpty((String)itemMap.get('FirstName'))) {
-                contact.FirstName = (String)itemMap.get('FirstName');
-            }
-            if (itemMap.containsKey('LeadSource') && String.isNotEmpty((String)itemMap.get('LeadSource'))) {
-                contact.LeadSource = (String)itemMap.get('LeadSource');
-            }
-            if (itemMap.containsKey('Description') && String.isNotEmpty((String)itemMap.get('Description'))) {
-                contact.Description = (String)itemMap.get('Description');
-            }
-            // IDがなし(新規) or 値変更(更新)の場合、登録対象としてリストに追加
-            if (String.isEmpty(contact.Id) || isChanged) {
-                contacts.add(contact);
+        for (Integer key : apexContactMap.keySet()) {
+            if (apexContactMap.containsKey(key)) {
+                // 取引先責任者情報取得
+                Contact c = apexContactMap.get(key).contact;
+                c.AccountId = accountId;
+                // 変更判定フラグ取得
+                Boolean isChanged = false;
+                if (apexContactMap.get(key).isChanged != null) {
+                    isChanged = apexContactMap.get(key).isChanged;
+                }
+                // IDなし(新規) or 値変更(更新)の場合、登録対象としてリストに追加
+                if (String.isEmpty(c.Id) || isChanged) {
+                    contacts.add(c);
+                }
             }
         }
-
         return contacts;
     }
 

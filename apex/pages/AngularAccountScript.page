@@ -20,16 +20,40 @@
                 $scope.doSave = function(event) {
                     event.preventDefault();
 
-                    // 取引先情報をセット
+                    // 取引先情報を取得
                     $scope.account = helper.getAccountObject(accountId);
-
                     var accountObj = $scope.account;
-                    var contactObj = JSON.stringify($scope.contacts);
+                    // 取引先責任者削除情報を取得
                     var delContactIdsObj = JSON.stringify($scope.delContactIds);
-
+                    // 取引先責任者情報を取得
+                    var apexContacts = getApexContacts($scope.contacts);
                     // 保存処理を実行
-                    doSaveByApex(accountObj, contactObj, delContactIdsObj);
+                    doSaveByApex(accountObj, delContactIdsObj, apexContacts);
                 };
+
+                // 保存対象の取引先責任者情報を取得
+                function getApexContacts(scopeContacts) {
+                    var apexContacts = {};
+                    for (i = 0; i < scopeContacts.length; i++) {  
+                        // オブジェクト型変数宣言
+                        var apexContact = {
+                            contact : {},
+                            isChanged : false
+                        };
+                        // 取引先責任者情報
+                        apexContact.contact.Id = scopeContacts[i].Id;
+                        apexContact.contact.LastName = scopeContacts[i].LastName;
+                        apexContact.contact.FirstName = scopeContacts[i].FirstName;
+                        apexContact.contact.LeadSource = scopeContacts[i].LeadSource;
+                        apexContact.contact.Description = scopeContacts[i].Description;
+                        // 変更フラグ
+                        apexContact.isChanged = scopeContacts[i].IsChanged;
+                        // リストに追加
+                        apexContacts[i] = apexContact;
+                    }
+
+                    return apexContacts;
+                }
 
                 // 行追加処理
                 $scope.addContactRow = function(event) {
@@ -72,9 +96,7 @@
                     return false;
                 }
 
-                /**
-                 * 選択リスト初期値取得
-                 */
+                // 選択リスト初期値取得
                 function getSelectListItemByApex() {
                     // RemoteAction
                     AngularAccountController.getAngularAccountSelectListItem(function(result, event){
@@ -89,9 +111,7 @@
                     return false;
                 }
 
-                /**
-                 * 選択リスト値取得
-                 */
+                // 選択リスト値取得
                 function getSelectListItem(resultMap) {
                     var resultObj = new Object();
                     var i = 0;
@@ -103,10 +123,10 @@
                 }
 
                 // 保存ボタンの処理
-                function doSaveByApex(accountObj, contactObj, delContactIdsObj) {
+                function doSaveByApex(accountObj, delContactIdsObj, apexContacts) {
                     $scope.errorMessages = [];
                     // RemoteAction
-                    AngularAccountController.doSave(accountObj, contactObj, delContactIdsObj, function(result, event){
+                    AngularAccountController.doSave(accountObj, delContactIdsObj, apexContacts, function(result, event){
                         if(event.status) {
                             if (result.errorMessages.length > 0) {
                                 // エラーメッセージを表示

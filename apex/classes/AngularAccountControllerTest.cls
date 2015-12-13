@@ -112,12 +112,12 @@ private class AngularAccountControllerTest {
         System.runAs(testAdminUser) {
 
             Account account = new Account();
-            String contactJSON = '';
             String deleteContactIdsJSON = '';
+            Map<Integer, AngularAccountApexContact> apexContactMap = new Map<Integer, AngularAccountApexContact>();
 
             Test.startTest();
 
-            AngularAccountResult result = AngularAccountController.doSave(account, contactJSON, deleteContactIdsJSON);
+            AngularAccountResult result = AngularAccountController.doSave(account, deleteContactIdsJSON, apexContactMap);
 
             Test.stopTest();
 
@@ -136,12 +136,12 @@ private class AngularAccountControllerTest {
             // 取引先テストデータ
             Account account = AngularAccountTester.createAccount(false);
 
-            String contactJSON = '';
             String deleteContactIdsJSON = '';
+            Map<Integer, AngularAccountApexContact> apexContactMap = new Map<Integer, AngularAccountApexContact>();
 
             Test.startTest();
 
-            AngularAccountResult result = AngularAccountController.doSave(account, contactJSON, deleteContactIdsJSON);
+            AngularAccountResult result = AngularAccountController.doSave(account, deleteContactIdsJSON, apexContactMap);
 
             Test.stopTest();
 
@@ -162,12 +162,12 @@ private class AngularAccountControllerTest {
             Account account = AngularAccountTester.createAccount(false);
             account.Name = '';
 
-            String contactJSON = '';
             String deleteContactIdsJSON = '';
+            Map<Integer, AngularAccountApexContact> apexContactMap = new Map<Integer, AngularAccountApexContact>();
 
             Test.startTest();
 
-            AngularAccountResult result = AngularAccountController.doSave(account, contactJSON, deleteContactIdsJSON);
+            AngularAccountResult result = AngularAccountController.doSave(account, deleteContactIdsJSON, apexContactMap);
 
             Test.stopTest();
 
@@ -186,21 +186,20 @@ private class AngularAccountControllerTest {
 
             // 取引先テストデータ
             Account account = AngularAccountTester.createAccount(false);
-
-            // JSON文字列の生成
-            JSONGenerator conGen = JSON.createGenerator(true);
-            conGen.writeStartObject();
-            conGen.writeBooleanField('IsChanged', false);
-            conGen.writeStringField('Id', '');
-            conGen.writeStringField('LastName', 'Salesforce');
-            conGen.writeStringField('FirstName', 'Saasy');
-            conGen.writeEndObject();
-            String contactJSON  = '[' + conGen.getAsString() + ']';
+            // 削除ID
             String deleteContactIdsJSON = '';
+            
+            // 取引先責任者
+            AngularAccountApexContact apexContact = new AngularAccountApexContact();
+            apexContact.contact = AngularAccountTester.createContact(new Account(), false);
+            apexContact.isChanged = false;
+
+            Map<Integer, AngularAccountApexContact> apexContactMap = new Map<Integer, AngularAccountApexContact>();
+            apexContactMap.put(0, apexContact);
 
             Test.startTest();
 
-            AngularAccountResult result = AngularAccountController.doSave(account, contactJSON, deleteContactIdsJSON);
+            AngularAccountResult result = AngularAccountController.doSave(account, deleteContactIdsJSON, apexContactMap);
 
             Test.stopTest();
 
@@ -222,21 +221,20 @@ private class AngularAccountControllerTest {
 
             // 取引先テストデータ
             Account account = AngularAccountTester.createAccount(false);
-
-            // JSON文字列の生成
-            JSONGenerator conGen = JSON.createGenerator(true);
-            conGen.writeStartObject();
-            conGen.writeBooleanField('IsChanged', false);
-            conGen.writeStringField('Id', '');
-            conGen.writeStringField('LastName', '');
-            conGen.writeStringField('FirstName', 'Saasy');
-            conGen.writeEndObject();
-            String contactJSON  = '[' + conGen.getAsString() + ']';
+            // 削除ID
             String deleteContactIdsJSON = '';
+            // 取引先責任者
+            AngularAccountApexContact apexContact = new AngularAccountApexContact();
+            apexContact.contact = AngularAccountTester.createContact(new Account(), false);
+            apexContact.contact.LastName = '';
+            apexContact.isChanged = false;
+
+            Map<Integer, AngularAccountApexContact> apexContactMap = new Map<Integer, AngularAccountApexContact>();
+            apexContactMap.put(0, apexContact);
 
             Test.startTest();
 
-            AngularAccountResult result = AngularAccountController.doSave(account, contactJSON, deleteContactIdsJSON);
+            AngularAccountResult result = AngularAccountController.doSave(account, deleteContactIdsJSON, apexContactMap);
 
             Test.stopTest();
 
@@ -258,15 +256,15 @@ private class AngularAccountControllerTest {
 
             // 取引先テストデータ
             Account account = AngularAccountTester.createAccount(true);
-            // 取引先責任者JSON文字列
-            String contactJSON  = '';
             // 取引先責任者情報作成
             Contact contact = AngularAccountTester.createContact(account, true);
             String deleteContactIdsJSON = '[' + '\"' + contact.Id + '\"' + ']';
+            // 取引先責任者
+            Map<Integer, AngularAccountApexContact> apexContactMap = new Map<Integer, AngularAccountApexContact>();
 
             Test.startTest();
 
-            AngularAccountResult result = AngularAccountController.doSave(account, contactJSON, deleteContactIdsJSON);
+            AngularAccountResult result = AngularAccountController.doSave(account, deleteContactIdsJSON, apexContactMap);
 
             Test.stopTest();
 

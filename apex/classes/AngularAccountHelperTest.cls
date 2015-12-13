@@ -95,16 +95,16 @@ private class AngularAccountHelperTest {
      * 取引先責任者取得
      * テストデータなし
      */
-    static testMethod void getContactsByJsonTest1() {
+    static testMethod void getContactsByApexMapTest1() {
         
         System.runAs(testAdminUser) {
 
+            Map<Integer, AngularAccountApexContact> apexContactMap = new Map<Integer, AngularAccountApexContact>();
             Id accountId = null;
-            List<Object> jsonContactList = new List<Object>();
 
             Test.startTest();
             
-            List<Contact> results = helper.getContactsByJson(accountId, jsonContactList);
+            List<Contact> results = helper.getContactsByApexMap(apexContactMap, accountId);
             
             Test.stopTest();
 
@@ -114,36 +114,22 @@ private class AngularAccountHelperTest {
 
     /**
      * 取引先責任者取得
-     * テストデータなし
+     * テストデータあり
      */
-    static testMethod void getContactsByJsonTest2() {
+    static testMethod void getContactsByApexMapTest2() {
         
         System.runAs(testAdminUser) {
-
-            // JSON文字列の生成
-            JSONGenerator gen = JSON.createGenerator(true);
-            gen.writeStartObject();
-            gen.writeBooleanField('IsChanged', false);
-            gen.writeStringField('Id', '');
-            gen.writeStringField('LastName', '');
-            gen.writeStringField('FirstName', '');
-            gen.writeEndObject();
-            String contactJSON  = '[' + gen.getAsString() + ']';
-
-            // 引数
+            Map<Integer, AngularAccountApexContact> apexContactMap = new Map<Integer, AngularAccountApexContact>();
+            apexContactMap.put(0, new AngularAccountApexContact());
             Id accountId = null;
-            List<Object> jsonContactList = (List<Object>) JSON.deserializeUntyped(contactJSON);
 
             Test.startTest();
             
-            List<Contact> results = helper.getContactsByJson(accountId, jsonContactList);
+            List<Contact> results = helper.getContactsByApexMap(apexContactMap, accountId);
             
             Test.stopTest();
 
             System.assertEquals(results.size(), 1);
-            System.assertEquals(String.isEmpty(results[0].Id), true);
-            System.assertEquals(String.isEmpty(results[0].LastName), true);
-            System.assertEquals(String.isEmpty(results[0].FirstName), true);
         }
     }
 
@@ -151,76 +137,54 @@ private class AngularAccountHelperTest {
      * 取引先責任者取得
      * テストデータあり
      */
-    static testMethod void getContactsByJsonTest3() {
+    static testMethod void getContactsByApexMapTest3() {
         
         System.runAs(testAdminUser) {
-
             Account account = AngularAccountTester.createAccount(true);
             Contact contact = AngularAccountTester.createContact(account, true);
 
-            // JSON文字列の生成
-            JSONGenerator gen = JSON.createGenerator(true);
-            gen.writeStartObject();
-            gen.writeBooleanField('IsChanged', true);
-            gen.writeIdField('Id', contact.Id);
-            gen.writeStringField('LastName', contact.LastName);
-            gen.writeStringField('FirstName', contact.FirstName);
-            gen.writeStringField('LeadSource', contact.LeadSource);
-            gen.writeStringField('Description', contact.Description);
-            gen.writeEndObject();
-            String contactJSON  = '[' + gen.getAsString() + ']';
+            AngularAccountApexContact apexContact = new AngularAccountApexContact();
+            apexContact.contact = contact;
 
-            // 引数
-            Id accountId = null;
-            List<Object> jsonContactList = (List<Object>) JSON.deserializeUntyped(contactJSON);
+            Map<Integer, AngularAccountApexContact> apexContactMap = new Map<Integer, AngularAccountApexContact>();
+            apexContactMap.put(0, apexContact);
+            Id accountId = account.Id;
 
             Test.startTest();
             
-            List<Contact> results = helper.getContactsByJson(accountId, jsonContactList);
-            
-            Test.stopTest();
-
-            System.assertEquals(results.size(), 1);
-            System.assertEquals(String.isNotEmpty(results[0].Id), true);
-            System.assertEquals(String.isNotEmpty(results[0].LastName), true);
-            System.assertEquals(String.isNotEmpty(results[0].FirstName), true);
-            System.assertEquals(String.isNotEmpty(results[0].LeadSource), true);
-            System.assertEquals(String.isNotEmpty(results[0].Description), true);
-        }
-    }
-
-    /**
-     * 取引先責任者取得
-     * テストデータあり
-     */
-    static testMethod void getContactsByJsonTest4() {
-        
-        System.runAs(testAdminUser) {
-
-            Account account = AngularAccountTester.createAccount(true);
-            Contact contact = AngularAccountTester.createContact(account, true);
-
-            // JSON文字列の生成
-            JSONGenerator gen = JSON.createGenerator(true);
-            gen.writeStartObject();
-            gen.writeBooleanField('IsChanged', false);
-            gen.writeIdField('Id', contact.Id);
-            gen.writeStringField('LastName', contact.LastName);
-            gen.writeStringField('FirstName', contact.FirstName);
-            gen.writeEndObject();
-            String contactJSON  = '[' + gen.getAsString() + ']';
-
-            // 引数
-            Id accountId = null;
-            List<Object> jsonContactList = (List<Object>) JSON.deserializeUntyped(contactJSON);
-
-            Test.startTest();
-            
-            List<Contact> results = helper.getContactsByJson(accountId, jsonContactList);
+            List<Contact> results = helper.getContactsByApexMap(apexContactMap, accountId);
             
             Test.stopTest();
 
             System.assertEquals(results.size(), 0);
+        }
+    }
+
+    /**
+     * 取引先責任者取得
+     * テストデータあり
+     */
+    static testMethod void getContactsByApexMapTest4() {
+        
+        System.runAs(testAdminUser) {
+            Account account = AngularAccountTester.createAccount(true);
+            Contact contact = AngularAccountTester.createContact(account, true);
+
+            AngularAccountApexContact apexContact = new AngularAccountApexContact();
+            apexContact.contact = contact;
+            apexContact.isChanged = true;
+
+            Map<Integer, AngularAccountApexContact> apexContactMap = new Map<Integer, AngularAccountApexContact>();
+            apexContactMap.put(0, apexContact);
+            Id accountId = account.Id;
+
+            Test.startTest();
+            
+            List<Contact> results = helper.getContactsByApexMap(apexContactMap, accountId);
+            
+            Test.stopTest();
+
+            System.assertEquals(results.size(), 1);
         }
     }
 
@@ -244,6 +208,7 @@ private class AngularAccountHelperTest {
             System.assertEquals(result.errorMessages.size(), 0);
         }
     }
+
     /**
      * 取引先責任者値判定
      * テストデータなし
