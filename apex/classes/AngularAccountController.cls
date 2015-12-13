@@ -69,7 +69,7 @@ public with sharing class AngularAccountController {
             upsert account;
 
             // 取引先責任者の登録
-            if (!apexContactMap.isEmpty()) {
+            if (!apexContactMap.KeySet().isEmpty()) {
                 // 取引先責任者取得
                 List<Contact> contacts = helper.getContactsByApexMap(apexContactMap, account.Id);
                 // 取引先責任者値チェック

@@ -47,7 +47,9 @@
                         apexContact.contact.LeadSource = scopeContacts[i].LeadSource;
                         apexContact.contact.Description = scopeContacts[i].Description;
                         // 変更フラグ
-                        apexContact.isChanged = scopeContacts[i].IsChanged;
+                        if (scopeContacts[i].IsChanged) {
+                            apexContact.isChanged = scopeContacts[i].IsChanged;
+                        }
                         // リストに追加
                         apexContacts[i] = apexContact;
                     }
@@ -65,6 +67,7 @@
                 $scope.doCopyContactRow = function(event, rowNo) {
                     event.preventDefault();
                     var targetContact = helper.setCopyContact(helper.getContactObject(), $scope.contacts[rowNo]);
+                    targetContact.IsChanged = true;
                     $scope.contacts.splice(rowNo + 1, 0, targetContact);
                 }
 
@@ -160,7 +163,12 @@
                     return accountId;
                 },
                 // 取引先オブジェクトを取得
-                getAccountObject: function(accountId) {
+                getAccountObject: function(prmAccountId) {
+                    var accountId = null;
+                    if (prmAccountId) {
+                        accountId = prmAccountId;
+                    }
+
                     var accountName = document.getElementById('{!$Component.form.block.section.accName}').value;
                     var accountNumber = document.getElementById('{!$Component.form.block.section.accNumber}').value;
                     return {
@@ -172,7 +180,7 @@
                 // 取引先責任者オブジェクト取得
                 getContactObject: function() {
                     return {
-                        Id: "",
+                        Id: null,
                         LastName: "",
                         FirstName: "",
                         LeadSource: "",
@@ -182,7 +190,7 @@
                 },
                 // 取引先責任者のコピー
                 setCopyContact: function(newContact, baseContact) {
-                    newContact.Id = "";
+                    newContact.Id = null;
                     newContact.LastName = baseContact.LastName;
                     newContact.FirstName = baseContact.FirstName;
                     newContact.LeadSource = baseContact.LeadSource;
