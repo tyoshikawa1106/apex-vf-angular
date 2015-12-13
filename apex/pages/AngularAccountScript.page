@@ -73,6 +73,14 @@
                     $scope.contacts[rowNo].IsChanged = true;
                 }
 
+                // 必須項目の未入力判定
+                $scope.isRequiredFieldInput = function(target) {
+                    if (target) {
+                        return true;
+                    }
+                    return false;
+                }
+
                 // 行削除処理
                 $scope.removeContactRow = function(event, rowNo) {
                     event.preventDefault();

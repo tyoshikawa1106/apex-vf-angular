@@ -22,6 +22,10 @@
             font-weight: bold;
         }
 
+        #vf-page .requiredField {
+            background-color: #f44336;
+        }
+
         /** Active Row */
         #vf-page .activeRow {
             background-color: #f1c516;
