@@ -101,10 +101,21 @@
                     AngularAccountController.getContacts(accountId, function(results, event){
                         if(event.status) {
                             $scope.contacts = results;
+                            // 選択リスト項目に値がない場合、ブランク値をセット
+                            setSelectListItemBlank();
                             $scope.$apply();
                         }
                     }, {escape: false});
                     return false;
+                }
+                
+                // 選択リスト項目に値がない場合、ブランク値をセット
+                function setSelectListItemBlank() {
+                    for (var i = 0; i < $scope.contacts.length; i++) {
+                        if (!$scope.contacts[i].LeadSource) {
+                            $scope.contacts[i].LeadSource = '';
+                        }
+                    }
                 }
 
                 // 選択リスト初期値取得
@@ -121,6 +132,8 @@
                     }, {escape: false});
                     return false;
                 }
+                
+                
 
                 // 選択リスト値取得
                 function getSelectListItem(resultMap) {
@@ -190,11 +203,10 @@
                 },
                 // 取引先責任者のコピー
                 setCopyContact: function(newContact, baseContact) {
+                    // 一括コピー
+                    newContact = angular.copy(baseContact);
+                    // コピー対象外初期化
                     newContact.Id = null;
-                    newContact.LastName = baseContact.LastName;
-                    newContact.FirstName = baseContact.FirstName;
-                    newContact.LeadSource = baseContact.LeadSource;
-                    newContact.Description = baseContact.Description;
                     newContact.IsChanged = false;
                     return newContact;
                 }
